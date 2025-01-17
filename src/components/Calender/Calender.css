@@ -1,0 +1,30 @@
+.celenderHead{
+    position: sticky;
+    top: 0;
+}
+.date{
+    display: inline;
+    /* width: 100%; */
+    /* display: block; */
+}
+.calenderBody{
+    display: flex;
+}
+.dateContainer{
+    flex-wrap: nowrap;
+}
+.monthName{
+    height: 15vh;
+    border: 1px solid black;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.monthName h1{
+    width: 15.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
