@@ -1,11 +1,11 @@
-.dayBox{
-    width: 12.5%;
-    display: flex;
-    justify-content: end;
-    position:sticky;
-    margin: 0;
+.dayBox {
+  width: 14.28%;
+  display: flex;
+  justify-content: end;
+  position: sticky;
+  margin: 0;
 }
-.makeSticky{
-    position:sticky;
-    top: 0;
+.makeSticky {
+  position: sticky;
+  top: 0;
 }

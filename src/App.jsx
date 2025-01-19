@@ -1,14 +1,11 @@
-import { useState } from 'react'
-import Calender from './components/Calender/Calender'
+import Calender from "./components/Calender/Calender";
 
 function App() {
-  
-
   return (
-    <>
-      <Calender/>
-    </>
-  )
+    <div>
+      <Calender />
+    </div>
+  );
 }
 
-export default App
+export default App;

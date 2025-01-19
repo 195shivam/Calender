@@ -6,6 +6,10 @@ import Dates from "../DateComponent/Dates";
 export default function Calender() {
   const [year, setYear] = useState(2025);
   const [month, setMonth] = useState("January");
+  const date = new Date().getDate();
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  // const [scrollDir, setScrollDir] = useState(0);
   const monthDays = {
     January: 31,
     February:
@@ -39,56 +43,100 @@ export default function Calender() {
     "December",
   ];
   const [monthNumber, setMonthNumber] = useState(0);
-  const dates = [];
+  const [dates, setDates] = useState([]);
   function makeMonthDays(days) {
     const newMonth = [];
     for (let i = 1; i <= days; i++) {
       newMonth.push(i);
     }
-    dates.push(newMonth);
+    return newMonth;
   }
-  makeMonthDays(
-    monthDays[monthArr[monthNumber - 1 === -1 ? 11 : monthNumber - 1]]
-  );
-  makeMonthDays(monthDays[monthArr[monthNumber]]);
-  makeMonthDays(
-    monthDays[monthArr[monthNumber + 1 === 12 ? 0 : monthNumber + 1]]
-  );
-  
-  
+  function addMonth() {
+    setDates((d) => [
+      ...d,
+      makeMonthDays(monthDays[monthArr[monthNumber % 12]]),
+    ]);
+  }
+
   useEffect(() => {
-    makeMonthDays(
-      monthDays[monthArr[monthNumber - 1 === -1 ? 11 : monthNumber - 1]]
-    );
-    makeMonthDays(monthDays[monthArr[monthNumber]]);
-    makeMonthDays(
-      monthDays[monthArr[monthNumber + 1 === 12 ? 0 : monthNumber + 1]]
-    );
-    console.log('run')
-    console.log(dates)
-  },[]);
-  const tempArr=[[1,2,3,4,5],[6,7,8,9],[1,2,3,3,4,5,5]]
+    if (monthNumber == 12) {
+      setYear((e) => e + 1);
+      setMonthNumber(0);
+    }
+
+    addMonth();
+    setMonth(monthArr[monthNumber]);
+  }, [monthNumber]);
+
+  useEffect(() => {
+    let lastScrolled = 0;
+    let totalScrollUp = 0;
+    window.addEventListener("scroll", () => {
+      const scrolled = Math.floor(window.scrollY);
+      if (scrolled === 0) {
+        totalScrollUp = 0;
+        setMonthNumber(0);
+      } else if (
+        scrolled > lastScrolled &&
+        (scrolled + window.innerHeight ==
+          document.documentElement.scrollHeight - 1 ||
+          scrolled + window.innerHeight ==
+            document.documentElement.scrollHeight)
+      ) {
+        totalScrollUp = 0;
+        setMonthNumber((m) => m + 1);
+      } else if (lastScrolled > scrolled) {
+        totalScrollUp += lastScrolled - scrolled;
+        if (totalScrollUp >= window.innerHeight) {
+          setMonthNumber((e) => e - 1);
+          totalScrollUp = 0;
+        }
+      }
+      lastScrolled = scrolled;
+    });
+  }, []);
 
   return (
-    <>
+    <div>
       <div className="celenderHead">
         <Month month={month} year={year} />
         <WeekDay />
       </div>
-      <div className="calenderBody">
-        r
-
-        <div className="dateContainer">
-          {dates.map((e) =>(
-            e.map((v,i)=>(
-              <div className="date" key={i}>
-                <Dates date={v} />
+      <div className=" d-grid  ">
+        <div className="row container-fluid m-0 p-0">
+          <div className="col-12">
+            <div className="row ">
+              <div className=" col">
+                <Dates />
               </div>
-            ))
-          ))}
-         
+              <div className=" col">
+                <Dates />
+              </div>
+              <div className=" col">
+                <Dates />
+              </div>
+              {dates.map((e) =>
+                e.map((v, i) => {
+                  return (
+                    <div
+                      className={`col fs-3 ${
+                        date === v &&
+                        monthNumber === currentMonth &&
+                        currentYear === year
+                          ? "bg-danger bg-opacity-25"
+                          : ""
+                      }`}
+                      key={i}
+                    >
+                      <Dates dates={v} />
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
