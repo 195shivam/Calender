@@ -1,31 +1,36 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Month from "../MonthComponent/Month";
 import WeekDay from "../WeekDayComponent/WeekDay";
 import "../Calender/Calender.css";
 import Dates from "../DateComponent/Dates";
 export default function Calender() {
-  const [year, setYear] = useState(2015);
+  const [year, setYear] = useState(2025);
   const [month, setMonth] = useState(0);
-  let monthCount=0;
-  let yearCount=2015
+  let monthCount = 0;
+  let yearCount = 2015;
+  let scrollFlag = useRef(0);
 
   function findWeekday(day, month, year) {
     // JavaScript months are 0-indexed (0 = January, 1 = February, ..., 11 = December)
     let date = new Date(year, month - 1, day); // Subtract 1 from month to get correct month index
-    
+
     // Array of weekday names
-    const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    
+    const weekdays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
     // Get the weekday index (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
     let weekdayIndex = date.getDay();
-    
+
     // Return the name of the weekday
     return weekdays[weekdayIndex];
-}
-  
-  
-  
- 
+  }
 
   const monthNames = [
     "January",
@@ -1053,22 +1058,40 @@ export default function Calender() {
     ],
   ];
   useEffect(() => {
-    let lastScrollTop = 0;
-    window.addEventListener('scroll', ()=> {
-      let scrollTop = window.scrollY || document.documentElement.scrollTop;
-    let scrollDelta = scrollTop - lastScrollTop;
-
-    if (Math.abs(scrollDelta) >= 800) {
-        // Perform your computation here
-        console.log('Threshold crossed, performing computation!');
-        
-        // Update the last scroll position
-        lastScrollTop = scrollTop;
+    if (scrollFlag.current === 0 && month === 12) {
+      console.log(month);
+      setYear(year + 1);
+      setMonth(0);
     }
+    if (scrollFlag.current === 1 && month === -1) {
+      setYear(year - 1);
+      setMonth(11);
+    }
+  }, [month]);
+  useEffect(() => {
+    window.scrollTo({
+      top: 53948,
+    });
+    let lastScrollTop = 0;
+    window.addEventListener("scroll", () => {
+      console.log(window.scrollY);
+      let scrollTop = window.scrollY || document.documentElement.scrollTop;
+      let scrollDelta = scrollTop - lastScrollTop;
 
+      if (Math.abs(scrollDelta) >= 500) {
+        if (scrollTop > lastScrollTop) {
+          console.log("DownScroll");
+          scrollFlag.current = 0;
+          setMonth((e) => e + 1);
+        } else {
+          console.log("UpScroll");
+          scrollFlag.current = 1;
+          setMonth((e) => e - 1);
+        }
+        lastScrollTop = scrollTop;
+      }
     });
   }, []);
-  
 
   return (
     <div>
@@ -1092,27 +1115,34 @@ export default function Calender() {
               <div className=" col ">
                 <Dates />
               </div>
-              {dates.map((e) =>
-                {
-                  
-                  monthCount++;
-                  if(monthCount===13){
-                    // monthCount==1;
-                    yearCount++;
-                  }
-                 return e.map((v, i) => {
-                  
+              {dates.map((e) => {
+                monthCount++;
+                if (monthCount === 13) {
+                  monthCount = 1;
+                  yearCount++;
+                }
+                return e.map((v, i) => {
                   return (
-                    <div className={`col fs-3 ${findWeekday(v,monthCount,yearCount)==='Sunday' || findWeekday(v,monthCount,yearCount)==='Saturday' ?'fontColor':''}`} key={i}>
-                      <Dates dates={v} month={monthCount} year={yearCount}  />
+                    <div
+                      className={`col fs-3 ${
+                        findWeekday(v, monthCount, yearCount) === "Sunday" ||
+                        findWeekday(v, monthCount, yearCount) === "Saturday"
+                          ? "fontColor"
+                          : ""
+                      } ${
+                        v === new Date().getDate() &&
+                        yearCount === new Date().getFullYear() &&
+                        monthCount === new Date().getMonth() + 1
+                          ? "bg-primary bg-opacity-25"
+                          : ""
+                      }`}
+                      key={i}
+                    >
+                      <Dates dates={v} month={monthCount} year={yearCount} />
                     </div>
                   );
-                  
-                })
-                
-                
-                
-})}
+                });
+              })}
             </div>
           </div>
         </div>
